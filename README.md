@@ -1,4 +1,4 @@
-# VAYANATASK
+# VAYANA-TASK
 PROJECT
 #######################  images ############
 
@@ -8,16 +8,19 @@ Dockerfile_nginx
 1) made EC2 insatnce 
 2) installed docker  (https://gist.github.com/npearce/6f3c7826c7499587f00957fee62f8ee9)
 3) ran docker dameons 
-4) made 2 images with above 2 files : iamges name :  myflask , my ngnix 
+4) make 2 images :myflask , myngnix  with above 2 docker files 
 
 ###########  Docker compose ######
 
 files name : docker-compose.yml
 
 1) install docker compose (https://gist.github.com/npearce/6f3c7826c7499587f00957fee62f8ee9   OR  https://docs.docker.com/compose/install/)
-2) make the 2 pods with this dokcer file 
+2) make the 2 pods with this dokcer compose file using images which created privios task 
 3) to check from local system :  curl -X GET 0.0.0.0:80   ( it will give output properly )
 
+Output should be like :
+[root@ip-172-31-58-62 ~]# curl -X GET 0.0.0.0:80
+Hello VAYANA!
 
 
 ######### terraform work prerequisite ######
