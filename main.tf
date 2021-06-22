@@ -1,20 +1,20 @@
 ####### provider ####
 
 provider "aws" {
-  region  = "eu-west-2" # Setting region 
+  region  = "us-east-1" # Setting region 
 }
 
+#### using  defult VPC/subnets companant  #########
 
-######  creation of 2 ECR repo  #######
-
-resource "aws_ecr_repository" "my_flask" {
-  name = "my-flask" # fask repo name 
+resource "aws_default_vpc" "default_vpc" {
 }
 
+resource "aws_default_subnet" "default_subnet_a" {
+  availability_zone = "us-east-1a"
+}
 
-###### make cluster #####
-resource "aws_ecs_cluster" "my_cluster" {
-  name = "my-cluster" # cluster name 
+resource "aws_default_subnet" "default_subnet_b" {
+  availability_zone = "us-east-1b"
 }
 
 ######## role for ECS ###########
@@ -43,6 +43,13 @@ resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+######  creation of  ECR repo  #######
+
+resource "aws_ecr_repository" "my_flask" {
+  name = "my-flask" # fask repo name 
+}
+
+
 ######### make our flask task defination #########
 
 resource "aws_ecs_task_definition" "my_first_flask" {
@@ -55,8 +62,8 @@ resource "aws_ecs_task_definition" "my_first_flask" {
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 80,
-          "hostPort": 80
+          "containerPort": 5000,
+          "hostPort": 5000
         }
       ],
       "memory": 512,
@@ -87,7 +94,7 @@ resource "aws_ecs_service" "my_service" {
   load_balancer {
     target_group_arn = "${aws_lb_target_group.target_group.arn}" # Referencing our target group
     container_name   = "${aws_ecs_task_definition.my_first_flask.family}"
-    container_port   = 80 # Specifying the container port
+    container_port   = 5000 # Specifying the container port
   }
 
   network_configuration {
@@ -96,36 +103,6 @@ resource "aws_ecs_service" "my_service" {
     security_groups  = ["${aws_security_group.service_security_group.id}"] # Setting the security group
   }
 
-}
-
-
-#### using  defult VPC/subnets companant  #########
-
-resource "aws_default_vpc" "default_vpc" {
-}
-
-resource "aws_default_subnet" "default_subnet_a" {
-  availability_zone = "eu-west-2a"
-}
-
-resource "aws_default_subnet" "default_subnet_b" {
-  availability_zone = "eu-west-2b"
-}
-
-##########   referncing flask service  to the subnets ####
-
-
-resource "aws_ecs_service" "my_service_ref" {
-  name            = "my_service_ref"                             # flask service name
-  cluster         = "${aws_ecs_cluster.my_cluster.id}"             # Referencing our  Cluster
-  task_definition = "${aws_ecs_task_definition.my_first_flask.arn}" # Referencing  our flask task 
-  launch_type     = "FARGATE"
-  desired_count   = 1 # number of containers you want for flask service
-
-  network_configuration {
-    subnets          = ["${aws_default_subnet.default_subnet_a.id}","${aws_default_subnet.default_subnet_b.id}"]
-    assign_public_ip = true # Providing flask containers with public IP
-  }
 }
 
 
@@ -167,7 +144,7 @@ resource "aws_security_group" "load_balancer_security_group" {
 
 resource "aws_lb_target_group" "target_group" {
   name        = "target-group"
-  port        = 80
+  port        = 5000
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = "${aws_default_vpc.default_vpc.id}" # Referencing default VPC
