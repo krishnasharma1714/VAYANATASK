@@ -67,8 +67,6 @@ for every task in terraform ,there is a comment on above each task , please take
 #############  flask service #####
 #############  nginx service #####
 #### using  defult VPC/subnets companant  #########
-##########   referncing flask service  to the subnets ####
-##########   referncing nginx service  to the subnets ####
 ##### making load balncer #######
 #### Creating a security group for the load balancer ########
 ####### directing  traffic, making  target group and listener ####
