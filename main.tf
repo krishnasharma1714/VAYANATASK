@@ -43,11 +43,18 @@ resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-######  creation of  ECR repo  #######
+######  creation of 2 ECR repo  #######
 
 resource "aws_ecr_repository" "my_flask" {
   name = "my-flask" # fask repo name 
 }
+
+
+###### make cluster #####
+resource "aws_ecs_cluster" "my_cluster" {
+  name = "my-cluster" # cluster name 
+}
+
 
 
 ######### make our flask task defination #########
@@ -183,4 +190,9 @@ resource "aws_security_group" "service_security_group" {
     protocol    = "-1" # Allowing any outgoing protocol 
     cidr_blocks = ["0.0.0.0/0"] # Allowing traffic out to all IP addresses
   }
+}
+
+
+output "dns_name" {
+  value = aws_alb.application_load_balancer.dns_name
 }
